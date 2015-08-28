@@ -27,7 +27,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
-		OptionDialog.MessageAlertDialogInput {
+		OptionDialog.MessageAlertDialogInput,
+		com.example.noteproject.NoteItemOptionDialog.MessageAlertDialogInput {
 	AccessDB database;
 	Button add_btn;
 	Context context;
@@ -38,6 +39,7 @@ public class MainActivity extends ActionBarActivity implements
 	public static final String KEY_CODE = "keycode";
 	public static final int REQUEST_EDIT = 345;
 	int noteItemId;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,15 +61,9 @@ public class MainActivity extends ActionBarActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
-				NoteItem noteItem1 = database.findById(arrlist1.get(position)
-						.getId());
-				noteItemId = noteItem1.getId();
-				Intent gotoEdit = new Intent(context, TextChoice.class);
-				gotoEdit.putExtra(KEY_CODE, EDIT_KEY);
-				gotoEdit.putExtra("title", noteItem1.getTitle());
-				gotoEdit.putExtra("content", noteItem1.getContent());
-
-				startActivityForResult(gotoEdit, REQUEST_EDIT);
+				NoteItemOptionDialog choice1 = new NoteItemOptionDialog(
+						arrlist1.get(position).getId());
+				choice1.show(getFragmentManager(), "choice");
 
 				// TODO Auto-generated method stub
 
@@ -144,7 +140,7 @@ public class MainActivity extends ActionBarActivity implements
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
 		// super.onActivityResult(arg0, arg1, arg2);
-		Log.d("key",""+requestCode);
+		Log.d("key", "" + requestCode);
 		if (requestCode == MainActivity.REQUEST_ADD_NEW) {
 			if (resultCode == RESULT_OK) {
 				database.createRow(data.getStringExtra("title"),
@@ -160,14 +156,44 @@ public class MainActivity extends ActionBarActivity implements
 		if (requestCode == MainActivity.REQUEST_EDIT) {
 			if (resultCode == RESULT_OK) {
 				Toast.makeText(MainActivity.this, "Update", Toast.LENGTH_SHORT)
-				.show();
-				
-				database.updateTitleContent(noteItemId, data.getStringExtra("title"), data.getStringExtra("content"));
-//				lLog.d("title",data.getStringExtra("title"));
-//				noteItemId
+						.show();
+
+				database.updateTitleContent(noteItemId,
+						data.getStringExtra("title"),
+						data.getStringExtra("content"));
+				// lLog.d("title",data.getStringExtra("title"));
+				// noteItemId
 				refresh();
 			}
 		}
-		
+
 	}
+
+	@Override
+	public void onDialogItemClick(DialogFragment dialog, String choice1,
+			int noteItem_id) {
+		// TODO Auto-generated method stub
+		// Log.d("Choice",choice1);
+		if (choice1.equals("Edit")) {
+			NoteItem noteItem1 = database.findById(arrlist1.get(
+					noteItem_id).getId());
+			noteItemId = noteItem1.getId();
+			Intent gotoEdit = new Intent(context, TextChoice.class);
+			gotoEdit.putExtra(KEY_CODE, EDIT_KEY);
+			gotoEdit.putExtra("title", noteItem1.getTitle());
+			gotoEdit.putExtra("content", noteItem1.getContent());
+
+			startActivityForResult(gotoEdit, REQUEST_EDIT);
+		}
+
+		if (choice1.equals("Delete")) {
+			//delete
+			database.deleteRow(noteItem_id);
+			Log.d("delete_id",""+noteItem_id);
+			refresh();
+			Toast.makeText(MainActivity.this, "Delete", Toast.LENGTH_SHORT)
+			.show();
+		}
+	}
+
 }

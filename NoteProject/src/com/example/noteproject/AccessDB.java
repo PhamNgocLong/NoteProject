@@ -47,7 +47,9 @@ public class AccessDB {
 		cursor.close();
 		return item;
 	}
-
+	
+	
+	
 	public NoteItem findById(int id) {
 		Cursor cs1 = database.rawQuery("SELECT * FROM " + DefineDB.TABLE_NAME
 				+ " WHERE " + DefineDB.COLUMN_ID + " = " + "'" + id + "';",
@@ -56,9 +58,10 @@ public class AccessDB {
 		return cursorToItem(cs1);
 	}
 
-	public void deleteRow(NoteItem item) {
+	public void deleteRow(int id) {
 		int i = database.delete(DefineDB.TABLE_NAME, DefineDB.COLUMN_ID + "="
-				+ "'" + item.getId() + "'", null);
+				+   id , null);
+		Log.d("delete", "" +i);
 	}
 
 	// public int selectByPhone(String phone) {
@@ -76,7 +79,7 @@ public class AccessDB {
 		while (!cs1.isAfterLast()) {
 			value.add(cursorToItem(cs1));
 			cs1.moveToNext();
-
+			
 		}
 		cs1.close();
 		return value;
@@ -89,6 +92,7 @@ public class AccessDB {
 				cursor.getString(3), Integer.parseInt(cursor.getString(5)));
 		item.setModified(cursor.getString(4));
 		item.setRemind(cursor.getString(6));
+		Log.d("id",""+item.getId());
 		return item;
 	}
 

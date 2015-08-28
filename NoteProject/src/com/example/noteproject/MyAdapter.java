@@ -29,6 +29,7 @@ public class MyAdapter extends ArrayAdapter<NoteItem>{
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View view1 = layout1.inflate(R.layout.note_item, parent, false);
 		TextView id = (TextView)view1.findViewById(R.id.textView1);
+		id.setVisibility(View.GONE);
 		TextView title=(TextView)view1.findViewById(R.id.textView2);
 		id.setText("" + arrlist1.get(position).getId());
 		title.setText(arrlist1.get(position).getTitle());
